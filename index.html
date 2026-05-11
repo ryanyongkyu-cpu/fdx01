@@ -68,6 +68,31 @@
       gap: 16px;
     }
 
+    #scroll-arrow {
+      position: fixed;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.3s, transform 0.3s;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 28px;
+      animation: arrowFloat 2.4s ease-in-out infinite;
+      border: none;
+      background: none;
+      padding: 8px;
+      line-height: 1;
+    }
+    #scroll-arrow:hover {
+      opacity: 1;
+    }
+    @keyframes arrowFloat {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(7px); }
+    }
+
     /* Mobile combined footer */
     .footer-mobile {
       display: none;
@@ -342,7 +367,7 @@
 
     const TOTAL    = 1500;
     const FADE_DUR = 1000;
-    const BAND_H   = 50;
+    const BAND_H   = 80;
     const SCROLL_T = 400;
     const n        = allDots.length;
     const EXP      = 2.8;
@@ -423,6 +448,11 @@
       ticking = false;
     }
 
+    /* Scroll arrow */
+    document.getElementById('scroll-arrow').addEventListener('click', function () {
+      window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+    });
+
     runAnimation();
 
     video.addEventListener('ended', function () {
@@ -432,6 +462,9 @@
     });
   })();
   </script>
+
+  <!-- Scroll arrow -->
+  <button id="scroll-arrow" aria-label="Scroll down">&#8964;</button>
 
   <!-- Desktop footer right -->
   <div class="footer-right">
