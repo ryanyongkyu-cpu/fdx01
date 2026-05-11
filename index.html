@@ -145,6 +145,7 @@
       overflow-y: hidden;
       scrollbar-width: none;
       cursor: grab;
+      scroll-snap-type: x mandatory;
     }
     #gallery-wrap:active { cursor: grabbing; }
     #gallery-wrap::-webkit-scrollbar { display: none; }
@@ -153,19 +154,23 @@
       display: flex;
       align-items: center;
       gap: 20px;
-      padding: 30px 60px;
+      padding: 30px max(40px, calc(50vw - 180px));
       width: max-content;
     }
 
     .gallery-card {
       flex-shrink: 0;
-      padding: 15px;
+      padding: 10px;
       background: #fff;
       cursor: pointer;
-      transition: transform 0.28s ease, box-shadow 0.28s ease;
+      transition: transform 0.38s ease, box-shadow 0.28s ease;
+      scroll-snap-align: center;
+      --gs: 1;
+      transform: scale(var(--gs));
+      transform-origin: center;
     }
     .gallery-card:hover {
-      transform: scale(1.06);
+      transform: scale(calc(var(--gs) * 1.06));
       box-shadow: 0 10px 40px rgba(255,255,255,0.18);
     }
     .gallery-card.portrait  .card-inner { width: 220px; height: 320px; }
@@ -196,7 +201,7 @@
       max-width: 70vw;
       max-height: 70vh;
       object-fit: contain;
-      padding: 15px;
+      padding: 10px;
       background: #fff;
       box-shadow: 0 0 80px rgba(0,0,0,0.6);
       cursor: pointer;
@@ -630,6 +635,33 @@
       var wrap  = document.getElementById('gallery-wrap');
       var lb    = document.getElementById('lightbox');
       var lbImg = document.getElementById('lightbox-img');
+      var cards = Array.from(document.querySelectorAll('.gallery-card'));
+
+      /* ── Scale cards based on distance from center ── */
+      function updateScales() {
+        var wrapCenter = wrap.scrollLeft + wrap.offsetWidth / 2;
+        var minDist = Infinity, centeredIdx = 0;
+        cards.forEach(function (card, i) {
+          var dist = Math.abs((card.offsetLeft + card.offsetWidth / 2) - wrapCenter);
+          if (dist < minDist) { minDist = dist; centeredIdx = i; }
+        });
+        cards.forEach(function (card, i) {
+          var d = Math.abs(i - centeredIdx);
+          var s = d === 0 ? 1 : d === 1 ? 0.8 : 0.6;
+          card.style.setProperty('--gs', s);
+        });
+      }
+
+      /* Run after snap settles */
+      var snapTimer;
+      wrap.addEventListener('scroll', function () {
+        clearTimeout(snapTimer);
+        snapTimer = setTimeout(updateScales, 80);
+      }, { passive: true });
+      wrap.addEventListener('scrollend', updateScales);
+
+      /* Initial state */
+      updateScales();
 
       /* Mouse-wheel → horizontal scroll */
       wrap.addEventListener('wheel', function (e) {
@@ -638,22 +670,25 @@
       }, { passive: false });
 
       /* Click-drag to scroll */
-      var dragging = false, startX, startLeft;
+      var didDrag = false, startX, startLeft;
       wrap.addEventListener('mousedown', function (e) {
-        dragging = true;
+        didDrag   = false;
         startX    = e.pageX;
         startLeft = wrap.scrollLeft;
       });
       window.addEventListener('mousemove', function (e) {
-        if (!dragging) return;
-        wrap.scrollLeft = startLeft - (e.pageX - startX);
+        if (startX === undefined) return;
+        if (Math.abs(e.pageX - startX) > 4) {
+          didDrag = true;
+          wrap.scrollLeft = startLeft - (e.pageX - startX);
+        }
       });
-      window.addEventListener('mouseup', function () { dragging = false; });
+      window.addEventListener('mouseup', function () { startX = undefined; });
 
       /* Lightbox */
-      document.querySelectorAll('.gallery-card').forEach(function (card) {
-        card.addEventListener('click', function (e) {
-          if (dragging) return;
+      cards.forEach(function (card) {
+        card.addEventListener('click', function () {
+          if (didDrag) { didDrag = false; return; }
           lbImg.src = card.dataset.src;
           lb.classList.add('active');
         });
