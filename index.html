@@ -443,6 +443,7 @@
       var h  = Math.round(vh + (BAND_H - vh) * eased);
 
       video.style.height    = h + 'px';
+      video.style.opacity   = (1 - eased * 0.4).toFixed(3);
       logoBand.style.height = h + 'px';
 
       isBandMode = progress > 0.01;
