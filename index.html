@@ -9,7 +9,6 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: #000000;
-      min-height: 200vh;
       overflow-y: auto;
     }
     #bg-video {
@@ -130,6 +129,75 @@
         color: inherit;
         text-decoration: none;
       }
+    }
+    /* ── Section 2: Gallery ── */
+    #s2-spacer { height: 100vh; }
+
+    #section2 {
+      background: #000;
+      padding: 100px 0 80px;
+      min-height: 100vh;
+    }
+
+    #gallery-wrap {
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+      cursor: grab;
+    }
+    #gallery-wrap:active { cursor: grabbing; }
+    #gallery-wrap::-webkit-scrollbar { display: none; }
+
+    #gallery-track {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 30px 60px;
+      width: max-content;
+    }
+
+    .gallery-card {
+      flex-shrink: 0;
+      padding: 5px;
+      background: #fff;
+      cursor: pointer;
+      transition: transform 0.28s ease, box-shadow 0.28s ease;
+    }
+    .gallery-card:hover {
+      transform: scale(1.06);
+      box-shadow: 0 10px 40px rgba(255,255,255,0.18);
+    }
+    .gallery-card.portrait  .card-inner { width: 220px; height: 320px; }
+    .gallery-card.landscape .card-inner { width: 340px; height: 240px; }
+
+    .card-inner { overflow: hidden; }
+    .card-inner img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    /* ── Lightbox ── */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.92);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    #lightbox.active { display: flex; }
+    #lightbox-img {
+      max-width: 70vw;
+      max-height: 70vh;
+      object-fit: contain;
+      box-shadow: 0 0 80px rgba(0,0,0,0.6);
+      cursor: default;
     }
   </style>
 </head>
@@ -477,6 +545,126 @@
       runAnimation();
     });
   })();
+  </script>
+
+  <!-- Section 2: Photo Gallery -->
+  <div id="s2-spacer"></div>
+  <section id="section2">
+    <div id="gallery-wrap">
+      <div id="gallery-track">
+
+        <div class="gallery-card portrait" data-src="image/sc 10.02.52.png">
+          <div class="card-inner"><img src="image/sc 10.02.52.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card landscape" data-src="image/sc 10.03.55.png">
+          <div class="card-inner"><img src="image/sc 10.03.55.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card portrait" data-src="image/sc 10.03.12.png">
+          <div class="card-inner"><img src="image/sc 10.03.12.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card landscape" data-src="image/sc 10.04.03.png">
+          <div class="card-inner"><img src="image/sc 10.04.03.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card portrait" data-src="image/sc 10.03.25.png">
+          <div class="card-inner"><img src="image/sc 10.03.25.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card landscape" data-src="image/sc 10.04.26.png">
+          <div class="card-inner"><img src="image/sc 10.04.26.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card portrait" data-src="image/sc 10.03.33.png">
+          <div class="card-inner"><img src="image/sc 10.03.33.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card landscape" data-src="image/sc 10.04.36.png">
+          <div class="card-inner"><img src="image/sc 10.04.36.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card portrait" data-src="image/sc 10.03.42.png">
+          <div class="card-inner"><img src="image/sc 10.03.42.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card landscape" data-src="image/sc 10.04.45.png">
+          <div class="card-inner"><img src="image/sc 10.04.45.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card portrait" data-src="image/sc 10.04.19.png">
+          <div class="card-inner"><img src="image/sc 10.04.19.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card landscape" data-src="image/sc 10.05.19.png">
+          <div class="card-inner"><img src="image/sc 10.05.19.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card portrait" data-src="image/sc 10.04.54.png">
+          <div class="card-inner"><img src="image/sc 10.04.54.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card landscape" data-src="image/sc 10.05.28.png">
+          <div class="card-inner"><img src="image/sc 10.05.28.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card portrait" data-src="image/sc 10.05.02.png">
+          <div class="card-inner"><img src="image/sc 10.05.02.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card landscape" data-src="image/sc 10.05.53.png">
+          <div class="card-inner"><img src="image/sc 10.05.53.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card portrait" data-src="image/sc 10.05.10.png">
+          <div class="card-inner"><img src="image/sc 10.05.10.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card portrait" data-src="image/sc 10.05.36.png">
+          <div class="card-inner"><img src="image/sc 10.05.36.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card portrait" data-src="image/sc 10.06.05.png">
+          <div class="card-inner"><img src="image/sc 10.06.05.png" loading="lazy" alt=""></div>
+        </div>
+        <div class="gallery-card portrait" data-src="image/sc 10.06.21.png">
+          <div class="card-inner"><img src="image/sc 10.06.21.png" loading="lazy" alt=""></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox -->
+  <div id="lightbox">
+    <img id="lightbox-img" alt="">
+  </div>
+
+  <script>
+    (function () {
+      var wrap  = document.getElementById('gallery-wrap');
+      var lb    = document.getElementById('lightbox');
+      var lbImg = document.getElementById('lightbox-img');
+
+      /* Mouse-wheel → horizontal scroll */
+      wrap.addEventListener('wheel', function (e) {
+        e.preventDefault();
+        wrap.scrollLeft += e.deltaY || e.deltaX;
+      }, { passive: false });
+
+      /* Click-drag to scroll */
+      var dragging = false, startX, startLeft;
+      wrap.addEventListener('mousedown', function (e) {
+        dragging = true;
+        startX    = e.pageX;
+        startLeft = wrap.scrollLeft;
+      });
+      window.addEventListener('mousemove', function (e) {
+        if (!dragging) return;
+        wrap.scrollLeft = startLeft - (e.pageX - startX);
+      });
+      window.addEventListener('mouseup', function () { dragging = false; });
+
+      /* Lightbox */
+      document.querySelectorAll('.gallery-card').forEach(function (card) {
+        card.addEventListener('click', function (e) {
+          if (dragging) return;
+          lbImg.src = card.dataset.src;
+          lb.classList.add('active');
+        });
+      });
+      lb.addEventListener('click', function (e) {
+        if (e.target === lbImg) return;
+        lb.classList.remove('active');
+        lbImg.src = '';
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { lb.classList.remove('active'); lbImg.src = ''; }
+      });
+    })();
   </script>
 
   <!-- Desktop footer right -->
