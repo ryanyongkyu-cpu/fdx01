@@ -1,22 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registered BI</title>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      margin: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       background: #000000;
+      overflow: hidden;
     }
-    svg { max-width: 100%; height: auto; }
+    #bg-video {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+    svg {
+      position: relative;
+      z-index: 1;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Desktop footers */
+    .footer-right {
+      position: fixed;
+      bottom: 20px;
+      right: 50px;
+      color: rgba(200, 200, 200, 0.8);
+      font-family: "Palatino Linotype", "Palatino", "Book Antiqua", serif;
+      font-size: 14px;
+      font-weight: 300;
+      text-align: left;
+      text-shadow: 2px 2px 4px rgba(80, 80, 80, 0.7);
+      z-index: 2;
+      line-height: 1.2;
+    }
+
+    .footer-left {
+      position: fixed;
+      bottom: 20px;
+      left: 50px;
+      color: rgba(200, 200, 200, 0.9);
+      font-family: "Palatino Linotype", "Palatino", "Book Antiqua", serif;
+      font-size: 16px;
+      font-weight: 300;
+      text-align: left;
+      text-shadow: 2px 2px 4px rgba(80, 80, 80, 0.7);
+      z-index: 2;
+      line-height: 1.5;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Mobile combined footer */
+    .footer-mobile {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .footer-right,
+      .footer-left {
+        display: none;
+      }
+
+      .footer-mobile {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        color: rgba(200, 200, 200, 0.9);
+        font-family: "Palatino Linotype", "Palatino", "Book Antiqua", serif;
+        font-size: 11px;
+        font-weight: 300;
+        text-align: center;
+        text-shadow: 2px 2px 4px rgba(80, 80, 80, 0.7);
+        z-index: 2;
+        line-height: 1.6;
+        padding: 12px 20px;
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      .footer-mobile a {
+        color: inherit;
+        text-decoration: none;
+      }
+    }
   </style>
 </head>
 <body>
+  <video id="bg-video" autoplay muted playsinline>
+    <source src="video/video_only.mp4" type="video/mp4">
+  </video>
   <svg
     version="1.1"
     id="svg1"
@@ -247,31 +332,102 @@
       pathEl.remove();
     });
 
-    /* Fisher-Yates shuffle */
-    for (let i = allDots.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      const tmp = allDots[i]; allDots[i] = allDots[j]; allDots[j] = tmp;
-    }
-
-    /* Schedule: slow start → accelerates → all lit by 2.5 s */
     const TOTAL    = 1500;
     const FADE_DUR = 1000;
     const n        = allDots.length;
     const EXP      = 2.8;
+    const svg      = document.getElementById('svg1');
+    const video    = document.getElementById('bg-video');
+    let   pending  = [];
 
-    allDots.forEach(function (dot, idx) {
-      const progress = n > 1 ? idx / (n - 1) : 1;
-      const t = Math.round((1 - Math.pow(1 - progress, EXP)) * TOTAL);
-      setTimeout(function () { dot.style.opacity = '1'; }, t);
+    function shuffle() {
+      for (let i = allDots.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = allDots[i]; allDots[i] = allDots[j]; allDots[j] = tmp;
+      }
+    }
+
+    function runAnimation() {
+      /* Cancel any in-flight timeouts from the previous run */
+      pending.forEach(clearTimeout);
+      pending = [];
+
+      /* Snap everything back without transition */
+      svg.style.transition = 'none';
+      svg.style.opacity    = '1';
+      allDots.forEach(function (dot) {
+        dot.style.transition = 'none';
+        dot.style.opacity    = '0.07';
+      });
+
+      /* Flush layout so resets apply before re-enabling transitions */
+      void svg.offsetWidth;
+
+      allDots.forEach(function (dot) {
+        dot.style.transition = 'opacity 70ms ease-out';
+      });
+
+      shuffle();
+
+      /* Schedule dots: slow start → fast finish */
+      allDots.forEach(function (dot, idx) {
+        const progress = n > 1 ? idx / (n - 1) : 1;
+        const t = Math.round((1 - Math.pow(1 - progress, EXP)) * TOTAL);
+        pending.push(setTimeout(function () { dot.style.opacity = '1'; }, t));
+      });
+
+      /* Stay fully lit 3 s, then fade out over 1 s */
+      pending.push(setTimeout(function () {
+        svg.style.transition = 'opacity ' + FADE_DUR + 'ms ease-in-out';
+        svg.style.opacity    = '0';
+      }, TOTAL + 3000));
+    }
+
+    /* Initial play */
+    runAnimation();
+
+    /* Restart animation each time the video loops */
+    video.addEventListener('ended', function () {
+      video.currentTime = 0;
+      video.play();
+      runAnimation();
     });
-
-    /* After all dots are lit, fade the whole logo out */
-    setTimeout(function () {
-      const svg = document.getElementById('svg1');
-      svg.style.transition = 'opacity ' + FADE_DUR + 'ms ease-in-out';
-      svg.style.opacity = '0';
-    }, TOTAL + 3000);
   })();
   </script>
+
+  <!-- Desktop footer right -->
+  <div class="footer-right">
+    <span style="font-size: 13px;">FACTORY OF FAITH SRL<br>
+    P.IVA &amp; C.F. IT02470851201</span><br>
+    Sede Legale : Via A. Costa 228, 40134 Bologna BO Italy<br>
+    Iscritta al registro delle Imprese di Bologna<br>
+    Iscrizione n. 02470851201
+  </div>
+
+  <!-- Desktop footer left -->
+  <div class="footer-left">
+    <a href="https://www.instagram.com/formedexpression/" target="_blank" style="color: inherit; text-decoration: none;">
+      <i class="fa-brands fa-instagram" style="font-size: 35px;"></i>
+    </a>
+    <div>
+      Piazza Bruxelles 5, 06083 Bastia Umbra PG Italy<br>
+      +39 075 545 1448<br>
+      info@factoryofaith.com
+    </div>
+  </div>
+
+  <!-- Mobile combined footer -->
+  <div class="footer-mobile">
+    <a href="https://www.instagram.com/formedexpression/" target="_blank">
+      <i class="fa-brands fa-instagram" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
+    </a>
+    Piazza Bruxelles 5, 06083 Bastia Umbra PG Italy &nbsp;|&nbsp;
+    +39 075 545 1448 &nbsp;|&nbsp;
+    info@factoryofaith.com<br>
+    FACTORY OF FAITH SRL &nbsp;|&nbsp;
+    P.IVA &amp; C.F. IT02470851201<br>
+    Sede Legale : Via A. Costa 228, 40134 Bologna BO Italy<br>
+    Iscritta al registro delle Imprese di Bologna | Iscrizione n. 02470851201
+  </div>
 </body>
 </html>
