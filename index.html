@@ -126,36 +126,94 @@
       }
     }
 
-    #scroll-arrow {
+    .view-film-btn {
       position: fixed;
       bottom: 36px;
       left: 50%;
-      transform: translateX(-50%) translateY(0) rotate(0deg);
+      transform: translateX(-50%);
       z-index: 10;
-      cursor: pointer;
-      opacity: 0.6;
-      transition: opacity 0.3s, transform 0.5s ease-in-out;
       color: rgba(255, 255, 255, 0.85);
-      font-size: 28px;
-      animation: arrowFloat 2.4s ease-in-out infinite;
-      border: none;
-      background: none;
-      padding: 8px;
-      line-height: 1;
+      font-family: 'Inter', Helvetica, Arial, sans-serif;
+      font-weight: 100;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+      padding-bottom: 4px;
+      text-shadow: 2px 2px 4px rgba(80, 80, 80, 0.7);
+      transition: opacity 0.3s ease;
+      opacity: 0.75;
     }
-    #scroll-arrow:hover {
+    .view-film-btn:hover {
       opacity: 1;
-    }
-    #scroll-arrow.flipped {
-      animation: none;
-      transform: translateX(-50%) translateY(0) rotate(180deg);
-    }
-    @keyframes arrowFloat {
-      0%, 100% { transform: translateX(-50%) translateY(0) rotate(0deg); }
-      50%       { transform: translateX(-50%) translateY(7px) rotate(0deg); }
     }
 
     #scroll-spacer { height: calc(100vh + 400px); }
+
+    /* ── Film modal (reference: forme-dexpression-site/seasons/season-latest.html) ── */
+    .film-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+    }
+    .film-modal:target { display: flex; }
+    .film-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+    }
+    .film-modal-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 680px;
+      padding: 0 24px;
+    }
+    .film-modal-content video {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .film-video-wrap { position: relative; }
+    .film-control {
+      position: absolute;
+      bottom: 14px;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.45);
+      border: none;
+      border-radius: 2px;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .film-control:hover { background: rgba(0, 0, 0, 0.68); }
+    .film-control svg { width: 16px; height: 16px; }
+    .film-mute { left: 14px; }
+    .film-fullscreen { right: 14px; }
+    .film-mute .waves { display: block; }
+    .film-mute .mute-line { display: none; }
+    .film-mute.is-muted .waves { display: none; }
+    .film-mute.is-muted .mute-line { display: block; }
+    .film-modal-close {
+      display: block;
+      text-align: right;
+      color: #fff;
+      font-family: 'Inter', Helvetica, Arial, sans-serif;
+      font-weight: 100;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      text-decoration: none;
+    }
+    .film-modal-close:hover { opacity: 0.7; }
   </style>
 </head>
 <body>
@@ -317,9 +375,38 @@
 
   <div id="scroll-spacer"></div>
 
-  <button id="scroll-arrow" aria-label="Scroll down">
-    <svg width="28" height="28" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg>
-  </button>
+  <a href="#film-modal" class="view-film-btn">View Full Video</a>
+
+  <div id="film-modal" class="film-modal">
+    <a href="#" class="film-modal-backdrop" aria-label="Close film"></a>
+    <div class="film-modal-content">
+      <a href="#" class="film-modal-close">Close ✕</a>
+      <div class="film-video-wrap">
+        <video autoplay muted loop playsinline preload="auto">
+          <source src="video/full-film.mp4" type="video/mp4">
+        </video>
+
+        <button type="button" class="film-control film-mute is-muted" aria-label="Toggle sound">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9v6h4l5 5V4L7 9H3z" fill="currentColor" stroke="none"/>
+            <g class="waves">
+              <path d="M16 8.5a5 5 0 0 1 0 7"/>
+              <path d="M18.5 6a8.5 8.5 0 0 1 0 12"/>
+            </g>
+            <g class="mute-line">
+              <path d="M16 9l5 6M21 9l-5 6"/>
+            </g>
+          </svg>
+        </button>
+
+        <button type="button" class="film-control film-fullscreen" aria-label="View full screen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="6" width="16" height="12" rx="1"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script>
   (function () {
@@ -493,10 +580,9 @@
 
   <script>
   (function () {
-    /* Footer reveal: hidden until the user scrolls down or clicks the arrow */
+    /* Footer reveal: hidden until the user scrolls down */
     const REVEAL_T = 60;
     const footers  = document.querySelectorAll('.footer-right, .footer-left, .footer-mobile');
-    const arrow    = document.getElementById('scroll-arrow');
     let   revealed = false;
 
     function updateReveal() {
@@ -504,7 +590,6 @@
       if (shouldReveal !== revealed) {
         revealed = shouldReveal;
         footers.forEach(function (el) { el.classList.toggle('visible', revealed); });
-        arrow.classList.toggle('flipped', revealed);
       }
     }
 
@@ -515,13 +600,25 @@
         ticking = true;
       }
     }, { passive: true });
+  })();
 
-    arrow.addEventListener('click', function () {
-      if (revealed) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        window.scrollBy({ top: window.innerHeight * 0.5, behavior: 'smooth' });
-      }
+  (function () {
+    /* Film modal: mute + fullscreen controls */
+    var wrap = document.querySelector('.film-video-wrap');
+    if (!wrap) return;
+    var video   = wrap.querySelector('video');
+    var muteBtn = wrap.querySelector('.film-mute');
+    var fsBtn   = wrap.querySelector('.film-fullscreen');
+
+    muteBtn.addEventListener('click', function () {
+      video.muted = !video.muted;
+      muteBtn.classList.toggle('is-muted', video.muted);
+    });
+
+    fsBtn.addEventListener('click', function () {
+      if (video.requestFullscreen) video.requestFullscreen();
+      else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+      else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
     });
   })();
   </script>
